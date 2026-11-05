@@ -1,0 +1,1328 @@
+{
+    "name": "Integration Gmail, Google Gemini AI",
+    "flow": [
+        {
+            "id": 2,
+            "module": "google-email:triggerWatchNewEmails",
+            "version": 4,
+            "parameters": {
+                "from": "",
+                "size": {
+                    "unit": "M",
+                    "amount": null,
+                    "criteria": "larger"
+                },
+                "limit": 10,
+                "folder": "CATEGORY_SOCIAL",
+                "format": "full",
+                "subject": "",
+                "criteria": "all",
+                "markSeen": true,
+                "filterType": "simpleSearch",
+                "__IMTCONN__": null,
+                "excludeWords": "",
+                "includeWords": "",
+                "hasAttachment": false
+            },
+            "mapper": {},
+            "metadata": {
+                "designer": {
+                    "x": 0,
+                    "y": 300,
+                    "name": "Watch New Emails",
+                    "messages": [
+                        {
+                            "category": "epochreq",
+                            "severity": "error",
+                            "message": "You must first choose from which point do you want to start processing your emails."
+                        },
+                        {
+                            "category": "setupreq",
+                            "severity": "error",
+                            "message": "This module doesn't have a connection. Create a connection in the module settings to continue."
+                        }
+                    ]
+                },
+                "restore": {
+                    "parameters": {
+                        "size": {
+                            "nested": {
+                                "unit": {
+                                    "label": "MB (megabytes)"
+                                },
+                                "criteria": {
+                                    "label": "Greater than"
+                                }
+                            }
+                        },
+                        "folder": {
+                            "label": "Social"
+                        },
+                        "format": {
+                            "label": "Full content"
+                        },
+                        "criteria": {
+                            "label": "All messages"
+                        },
+                        "filterType": {
+                            "label": "Simple filter"
+                        },
+                        "__IMTCONN__": {
+                            "data": {
+                                "scoped": "true",
+                                "connection": "google-email"
+                            },
+                            "label": "Night's Gmail connection (nightwraith18@gmail.com)"
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "__IMTCONN__",
+                        "type": "account:google-email",
+                        "label": "Connection",
+                        "required": true
+                    },
+                    {
+                        "name": "filterType",
+                        "type": "select",
+                        "label": "Filter type",
+                        "required": true,
+                        "validate": {
+                            "enum": [
+                                "simpleSearch",
+                                "gmailSearch"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "format",
+                        "type": "select",
+                        "label": "Content format",
+                        "required": true,
+                        "validate": {
+                            "enum": [
+                                "full",
+                                "raw",
+                                "metadata",
+                                "minimal"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "folder",
+                        "type": "select",
+                        "label": "Folder",
+                        "required": true
+                    },
+                    {
+                        "name": "labelIds",
+                        "type": "select",
+                        "label": "Label"
+                    },
+                    {
+                        "name": "criteria",
+                        "type": "select",
+                        "label": "Criteria",
+                        "required": true,
+                        "validate": {
+                            "enum": [
+                                "all",
+                                "is:read",
+                                "is:unread"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "markSeen",
+                        "type": "boolean",
+                        "label": "Mark email message(s) as read when fetched"
+                    },
+                    {
+                        "name": "limit",
+                        "type": "uinteger",
+                        "label": "Limit",
+                        "required": true,
+                        "validate": {
+                            "max": 500
+                        }
+                    },
+                    {
+                        "name": "from",
+                        "type": "email",
+                        "label": "Sender email address"
+                    },
+                    {
+                        "name": "subject",
+                        "type": "text",
+                        "label": "Subject"
+                    },
+                    {
+                        "name": "includeWords",
+                        "type": "text",
+                        "label": "Has the words"
+                    },
+                    {
+                        "name": "excludeWords",
+                        "type": "text",
+                        "label": "Doesn't have"
+                    },
+                    {
+                        "name": "size",
+                        "spec": [
+                            {
+                                "name": "criteria",
+                                "type": "select",
+                                "label": "Criteria",
+                                "validate": {
+                                    "enum": [
+                                        "larger",
+                                        "smaller"
+                                    ]
+                                }
+                            },
+                            {
+                                "name": "amount",
+                                "type": "integer",
+                                "label": "Size",
+                                "validate": {
+                                    "min": 0
+                                }
+                            },
+                            {
+                                "name": "unit",
+                                "type": "select",
+                                "label": "Size unit",
+                                "validate": {
+                                    "enum": [
+                                        "M",
+                                        "K",
+                                        "bytes"
+                                    ]
+                                }
+                            }
+                        ],
+                        "type": "collection",
+                        "label": "Email size"
+                    },
+                    {
+                        "name": "hasAttachment",
+                        "type": "boolean",
+                        "label": "Only emails with attachments/media",
+                        "required": true
+                    }
+                ],
+                "interface": [
+                    {
+                        "name": "id",
+                        "type": "text",
+                        "label": "Message ID"
+                    },
+                    {
+                        "name": "threadId",
+                        "type": "text",
+                        "label": "Thread ID"
+                    },
+                    {
+                        "name": "internalDate",
+                        "type": "date",
+                        "label": "Date"
+                    },
+                    {
+                        "name": "subject",
+                        "type": "text",
+                        "label": "Subject",
+                        "condition": true
+                    },
+                    {
+                        "name": "fromName",
+                        "type": "text",
+                        "label": "From (name)",
+                        "condition": true
+                    },
+                    {
+                        "name": "fromEmail",
+                        "type": "text",
+                        "label": "From (email)",
+                        "condition": true
+                    },
+                    {
+                        "name": "to",
+                        "spec": {
+                            "spec": [
+                                {
+                                    "name": "name",
+                                    "type": "text",
+                                    "label": "Name"
+                                },
+                                {
+                                    "name": "email",
+                                    "type": "text",
+                                    "label": "Email"
+                                }
+                            ],
+                            "type": "collection"
+                        },
+                        "type": "array",
+                        "label": "To",
+                        "condition": true
+                    },
+                    {
+                        "name": "cc",
+                        "spec": [
+                            {
+                                "name": "email",
+                                "type": "email",
+                                "label": "Email"
+                            },
+                            {
+                                "name": "name",
+                                "type": "text",
+                                "label": "Name"
+                            }
+                        ],
+                        "type": "array",
+                        "label": "CC",
+                        "condition": true
+                    },
+                    {
+                        "name": "bcc",
+                        "spec": [
+                            {
+                                "name": "email",
+                                "type": "email",
+                                "label": "Email"
+                            },
+                            {
+                                "name": "name",
+                                "type": "text",
+                                "label": "Name"
+                            }
+                        ],
+                        "type": "array",
+                        "label": "BCC",
+                        "condition": true
+                    },
+                    {
+                        "name": "snippet",
+                        "type": "text",
+                        "label": "Snippet"
+                    },
+                    {
+                        "name": "fullTextBody",
+                        "type": "text",
+                        "label": "Full text body",
+                        "condition": true
+                    },
+                    {
+                        "name": "htmlBody",
+                        "type": "text",
+                        "label": "HTML body",
+                        "condition": true
+                    },
+                    {
+                        "name": "hasAttachment",
+                        "type": "boolean",
+                        "label": "Has attachment",
+                        "condition": true
+                    },
+                    {
+                        "name": "hasMedia",
+                        "type": "boolean",
+                        "label": "Has media",
+                        "condition": true
+                    },
+                    {
+                        "name": "sysFolders",
+                        "spec": [
+                            {
+                                "name": "id",
+                                "type": "text",
+                                "label": "System folder ID"
+                            },
+                            {
+                                "name": "name",
+                                "type": "text",
+                                "label": "System folder name"
+                            }
+                        ],
+                        "type": "array",
+                        "label": "System folders"
+                    },
+                    {
+                        "name": "categoryFolders",
+                        "spec": [
+                            {
+                                "name": "id",
+                                "type": "text",
+                                "label": "Category folder ID"
+                            },
+                            {
+                                "name": "name",
+                                "type": "text",
+                                "label": "Category folder name"
+                            }
+                        ],
+                        "type": "array",
+                        "label": "Category folders"
+                    },
+                    {
+                        "name": "userLabelFolders",
+                        "spec": [
+                            {
+                                "name": "id",
+                                "type": "text",
+                                "label": "User label folder ID"
+                            },
+                            {
+                                "name": "name",
+                                "type": "text",
+                                "label": "User label folder name"
+                            }
+                        ],
+                        "type": "array",
+                        "label": "User label folders"
+                    },
+                    {
+                        "name": "labelIds",
+                        "spec": {
+                            "type": "text"
+                        },
+                        "type": "array",
+                        "label": "Message folder IDs"
+                    },
+                    {
+                        "name": "headers",
+                        "spec": [
+                            {
+                                "name": "Delivered-To",
+                                "type": "text",
+                                "label": "Delivered-To"
+                            },
+                            {
+                                "name": "Received",
+                                "type": "text",
+                                "label": "Received"
+                            },
+                            {
+                                "name": "Date",
+                                "type": "text",
+                                "label": "Date (header)"
+                            },
+                            {
+                                "name": "X-Original-Sender",
+                                "type": "text"
+                            },
+                            {
+                                "name": "Reply-To",
+                                "type": "text"
+                            },
+                            {
+                                "name": "Subject",
+                                "type": "text",
+                                "label": "Subject"
+                            },
+                            {
+                                "name": "From",
+                                "type": "text",
+                                "label": "From"
+                            },
+                            {
+                                "name": "To",
+                                "type": "text",
+                                "label": "To"
+                            },
+                            {
+                                "name": "Message-ID",
+                                "type": "text",
+                                "label": "Message-ID"
+                            },
+                            {
+                                "name": "In-Reply-To",
+                                "type": "text",
+                                "label": "In-Reply-To"
+                            }
+                        ],
+                        "type": "collection",
+                        "label": "Headers",
+                        "condition": true
+                    },
+                    {
+                        "name": "sizeEstimate",
+                        "type": "number",
+                        "label": "Size estimate"
+                    },
+                    {
+                        "name": "historyId",
+                        "type": "text",
+                        "label": "History ID"
+                    }
+                ]
+            }
+        },
+        {
+            "id": 3,
+            "module": "gemini-ai:simpleTextPrompt",
+            "version": 1,
+            "parameters": {},
+            "mapper": {
+                "model": "gemini-2.5-flash",
+                "textPrompt": "Classify this incoming email into exactly one category: Billing, Tech, or General.\n\nSubject: {{2.subject}}\n\nEmail body:\n{{2.fullTextBody}}\n\nReply with exactly one word: Billing, Tech, or General."
+            },
+            "metadata": {
+                "designer": {
+                    "x": 300,
+                    "y": 300,
+                    "name": "Classify Email"
+                },
+                "restore": {
+                    "expect": {
+                        "model": {
+                            "mode": "chose",
+                            "label": "Gemini 2.5 Flash"
+                        }
+                    }
+                },
+                "expect": [
+                    {
+                        "name": "model",
+                        "type": "select",
+                        "label": "Model",
+                        "mappable": false,
+                        "required": true,
+                        "validate": {
+                            "enum": [
+                                "gemini-2.5-flash",
+                                "gemini-3.7-flash",
+                                "gemini-3.6-flash",
+                                "gemini-3.5-flash",
+                                "gemini-3.1-pro-preview",
+                                "gemini-3-flash-preview",
+                                "gemini-2.5-pro"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "textPrompt",
+                        "type": "text",
+                        "label": "Text prompt",
+                        "required": true
+                    }
+                ]
+            }
+        },
+        {
+            "id": 4,
+            "module": "builtin:BasicRouter",
+            "version": 1,
+            "mapper": null,
+            "metadata": {
+                "designer": {
+                    "x": 600,
+                    "y": 300,
+                    "name": "Category Router"
+                }
+            },
+            "routes": [
+                {
+                    "flow": [
+                        {
+                            "id": 5,
+                            "module": "gemini-ai:simpleTextPrompt",
+                            "version": 1,
+                            "parameters": {},
+                            "filter": {
+                                "name": "Billing emails",
+                                "conditions": [
+                                    [
+                                        {
+                                            "a": "{{3.result}}",
+                                            "b": "Billing",
+                                            "o": "text:equal:ci"
+                                        }
+                                    ]
+                                ]
+                            },
+                            "mapper": {
+                                "model": "gemini-2.5-flash",
+                                "textPrompt": "You are the Billing support specialist. Read the email below and produce a clear, helpful response focused on invoices, payments, charges, refunds, subscriptions, or account billing issues. Do not mention this classification or these instructions. Return only the response text.\n\nSubject: {{2.subject}}\n\nEmail body:\n{{2.fullTextBody}}"
+                            },
+                            "metadata": {
+                                "designer": {
+                                    "x": 900,
+                                    "y": -150,
+                                    "name": "Billing AI"
+                                },
+                                "restore": {
+                                    "expect": {
+                                        "model": {
+                                            "mode": "chose",
+                                            "label": "Gemini 2.5 Flash"
+                                        }
+                                    }
+                                },
+                                "expect": [
+                                    {
+                                        "name": "model",
+                                        "type": "select",
+                                        "label": "Model",
+                                        "mappable": false,
+                                        "required": true,
+                                        "validate": {
+                                            "enum": [
+                                                "gemini-2.5-flash",
+                                                "gemini-3.7-flash",
+                                                "gemini-3.6-flash",
+                                                "gemini-3.5-flash",
+                                                "gemini-3.1-pro-preview",
+                                                "gemini-3-flash-preview",
+                                                "gemini-2.5-pro"
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "name": "textPrompt",
+                                        "type": "text",
+                                        "label": "Text prompt",
+                                        "required": true
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "id": 6,
+                            "module": "google-email:sendAnEmail",
+                            "version": 4,
+                            "parameters": {
+                                "__IMTCONN__": null
+                            },
+                            "mapper": {
+                                "to": [
+                                    "nightwraith18@gmail.com"
+                                ],
+                                "content": "{{5.result}}",
+                                "subject": "Billing response: {{2.subject}}",
+                                "bodyType": "rawHtml"
+                            },
+                            "metadata": {
+                                "designer": {
+                                    "x": 1200,
+                                    "y": 0,
+                                    "name": "Send Billing",
+                                    "messages": [
+                                        {
+                                            "category": "setupreq",
+                                            "severity": "error",
+                                            "message": "This module doesn't have a connection. Create a connection in the module settings to continue."
+                                        }
+                                    ]
+                                },
+                                "restore": {
+                                    "expect": {
+                                        "bodyType": {
+                                            "mode": "chose",
+                                            "label": "Raw HTML",
+                                            "nested": [
+                                                {
+                                                    "help": "You can use complete HTML code.",
+                                                    "name": "content",
+                                                    "type": "text",
+                                                    "label": "Content"
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "parameters": {
+                                        "__IMTCONN__": {
+                                            "label": "Night's Gmail connection"
+                                        }
+                                    }
+                                },
+                                "parameters": [
+                                    {
+                                        "name": "__IMTCONN__",
+                                        "type": "account:google-email",
+                                        "label": "Connection",
+                                        "required": true
+                                    }
+                                ],
+                                "expect": [
+                                    {
+                                        "name": "to",
+                                        "spec": {
+                                            "type": "email",
+                                            "label": "Recipient email address",
+                                            "required": true,
+                                            "validate": true
+                                        },
+                                        "type": "array",
+                                        "label": "To",
+                                        "labels": {
+                                            "add": "Add recipient",
+                                            "edit": "Edit recipient"
+                                        },
+                                        "required": true
+                                    },
+                                    {
+                                        "name": "subject",
+                                        "type": "text",
+                                        "label": "Subject"
+                                    },
+                                    {
+                                        "name": "bodyType",
+                                        "type": "select",
+                                        "label": "Body type",
+                                        "mappable": false,
+                                        "required": true,
+                                        "validate": {
+                                            "enum": [
+                                                "rawHtml",
+                                                "collection"
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "name": "content",
+                                        "type": "text",
+                                        "label": "Content"
+                                    },
+                                    {
+                                        "name": "attachments",
+                                        "spec": {
+                                            "spec": [
+                                                {
+                                                    "name": "filename",
+                                                    "type": "filename",
+                                                    "label": "File name",
+                                                    "required": true,
+                                                    "semantic": "file:name"
+                                                },
+                                                {
+                                                    "name": "data",
+                                                    "type": "buffer",
+                                                    "label": "Data",
+                                                    "required": true,
+                                                    "semantic": "file:data"
+                                                }
+                                            ],
+                                            "type": "collection",
+                                            "label": "Attachment"
+                                        },
+                                        "type": "array",
+                                        "label": "Attachments",
+                                        "labels": {
+                                            "add": "Add attachment",
+                                            "edit": "Edit attachment"
+                                        }
+                                    },
+                                    {
+                                        "name": "from",
+                                        "type": "select",
+                                        "label": "From",
+                                        "dynamic": true,
+                                        "advanced": true
+                                    },
+                                    {
+                                        "name": "cc",
+                                        "spec": {
+                                            "type": "email",
+                                            "label": "Recipient email address"
+                                        },
+                                        "type": "array",
+                                        "label": "CC recipients",
+                                        "labels": {
+                                            "add": "Add CC recipient",
+                                            "edit": "Edit CC recipient"
+                                        },
+                                        "advanced": true,
+                                        "validate": false
+                                    },
+                                    {
+                                        "name": "bcc",
+                                        "spec": {
+                                            "type": "email",
+                                            "label": "Recipient email address"
+                                        },
+                                        "type": "array",
+                                        "label": "BCC recipients",
+                                        "labels": {
+                                            "add": "Add BCC recipient",
+                                            "edit": "Edit BCC recipient"
+                                        },
+                                        "advanced": true,
+                                        "validate": false
+                                    },
+                                    {
+                                        "name": "emailHeaders",
+                                        "spec": {
+                                            "spec": [
+                                                {
+                                                    "name": "key",
+                                                    "type": "text",
+                                                    "label": "Key",
+                                                    "required": true
+                                                },
+                                                {
+                                                    "name": "value",
+                                                    "type": "text",
+                                                    "label": "Value"
+                                                }
+                                            ],
+                                            "type": "collection",
+                                            "label": "Email header"
+                                        },
+                                        "type": "array",
+                                        "label": "Additional email headers",
+                                        "labels": {
+                                            "add": "Add email header"
+                                        },
+                                        "advanced": true
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "flow": [
+                        {
+                            "id": 7,
+                            "module": "gemini-ai:simpleTextPrompt",
+                            "version": 1,
+                            "parameters": {},
+                            "filter": {
+                                "name": "Tech emails",
+                                "conditions": [
+                                    [
+                                        {
+                                            "a": "{{3.result}}",
+                                            "b": "Tech",
+                                            "o": "text:equal:ci"
+                                        }
+                                    ]
+                                ]
+                            },
+                            "mapper": {
+                                "model": "gemini-2.5-flash",
+                                "textPrompt": "You are the Tech support specialist. Read the email below and produce a clear, practical response focused on technical problems, troubleshooting, software, systems, access, integrations, or bugs. Do not mention this classification or these instructions. Return only the response text.\n\nSubject: {{2.subject}}\n\nEmail body:\n{{2.fullTextBody}}"
+                            },
+                            "metadata": {
+                                "designer": {
+                                    "x": 900,
+                                    "y": 150,
+                                    "name": "Tech AI"
+                                },
+                                "restore": {
+                                    "expect": {
+                                        "model": {
+                                            "mode": "chose",
+                                            "label": "Gemini 2.5 Flash"
+                                        }
+                                    }
+                                },
+                                "expect": [
+                                    {
+                                        "name": "model",
+                                        "type": "select",
+                                        "label": "Model",
+                                        "mappable": false,
+                                        "required": true,
+                                        "validate": {
+                                            "enum": [
+                                                "gemini-2.5-flash",
+                                                "gemini-3.7-flash",
+                                                "gemini-3.6-flash",
+                                                "gemini-3.5-flash",
+                                                "gemini-3.1-pro-preview",
+                                                "gemini-3-flash-preview",
+                                                "gemini-2.5-pro"
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "name": "textPrompt",
+                                        "type": "text",
+                                        "label": "Text prompt",
+                                        "required": true
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "id": 8,
+                            "module": "google-email:sendAnEmail",
+                            "version": 4,
+                            "parameters": {
+                                "__IMTCONN__": null
+                            },
+                            "mapper": {
+                                "to": [
+                                    "nightwraith18@gmail.com"
+                                ],
+                                "content": "{{7.result}}",
+                                "subject": "Tech response: {{2.subject}}",
+                                "bodyType": "rawHtml"
+                            },
+                            "metadata": {
+                                "designer": {
+                                    "x": 1200,
+                                    "y": 300,
+                                    "name": "Send Tech",
+                                    "messages": [
+                                        {
+                                            "category": "setupreq",
+                                            "severity": "error",
+                                            "message": "This module doesn't have a connection. Create a connection in the module settings to continue."
+                                        }
+                                    ]
+                                },
+                                "restore": {
+                                    "expect": {
+                                        "bodyType": {
+                                            "mode": "chose",
+                                            "label": "Raw HTML",
+                                            "nested": [
+                                                {
+                                                    "help": "You can use complete HTML code.",
+                                                    "name": "content",
+                                                    "type": "text",
+                                                    "label": "Content"
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "parameters": {
+                                        "__IMTCONN__": {
+                                            "label": "Night's Gmail connection"
+                                        }
+                                    }
+                                },
+                                "parameters": [
+                                    {
+                                        "name": "__IMTCONN__",
+                                        "type": "account:google-email",
+                                        "label": "Connection",
+                                        "required": true
+                                    }
+                                ],
+                                "expect": [
+                                    {
+                                        "name": "to",
+                                        "spec": {
+                                            "type": "email",
+                                            "label": "Recipient email address",
+                                            "required": true,
+                                            "validate": true
+                                        },
+                                        "type": "array",
+                                        "label": "To",
+                                        "labels": {
+                                            "add": "Add recipient",
+                                            "edit": "Edit recipient"
+                                        },
+                                        "required": true
+                                    },
+                                    {
+                                        "name": "subject",
+                                        "type": "text",
+                                        "label": "Subject"
+                                    },
+                                    {
+                                        "name": "bodyType",
+                                        "type": "select",
+                                        "label": "Body type",
+                                        "mappable": false,
+                                        "required": true,
+                                        "validate": {
+                                            "enum": [
+                                                "rawHtml",
+                                                "collection"
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "name": "content",
+                                        "type": "text",
+                                        "label": "Content"
+                                    },
+                                    {
+                                        "name": "attachments",
+                                        "spec": {
+                                            "spec": [
+                                                {
+                                                    "name": "filename",
+                                                    "type": "filename",
+                                                    "label": "File name",
+                                                    "required": true,
+                                                    "semantic": "file:name"
+                                                },
+                                                {
+                                                    "name": "data",
+                                                    "type": "buffer",
+                                                    "label": "Data",
+                                                    "required": true,
+                                                    "semantic": "file:data"
+                                                }
+                                            ],
+                                            "type": "collection",
+                                            "label": "Attachment"
+                                        },
+                                        "type": "array",
+                                        "label": "Attachments",
+                                        "labels": {
+                                            "add": "Add attachment",
+                                            "edit": "Edit attachment"
+                                        }
+                                    },
+                                    {
+                                        "name": "from",
+                                        "type": "select",
+                                        "label": "From",
+                                        "dynamic": true,
+                                        "advanced": true
+                                    },
+                                    {
+                                        "name": "cc",
+                                        "spec": {
+                                            "type": "email",
+                                            "label": "Recipient email address"
+                                        },
+                                        "type": "array",
+                                        "label": "CC recipients",
+                                        "labels": {
+                                            "add": "Add CC recipient",
+                                            "edit": "Edit CC recipient"
+                                        },
+                                        "advanced": true,
+                                        "validate": false
+                                    },
+                                    {
+                                        "name": "bcc",
+                                        "spec": {
+                                            "type": "email",
+                                            "label": "Recipient email address"
+                                        },
+                                        "type": "array",
+                                        "label": "BCC recipients",
+                                        "labels": {
+                                            "add": "Add BCC recipient",
+                                            "edit": "Edit BCC recipient"
+                                        },
+                                        "advanced": true,
+                                        "validate": false
+                                    },
+                                    {
+                                        "name": "emailHeaders",
+                                        "spec": {
+                                            "spec": [
+                                                {
+                                                    "name": "key",
+                                                    "type": "text",
+                                                    "label": "Key",
+                                                    "required": true
+                                                },
+                                                {
+                                                    "name": "value",
+                                                    "type": "text",
+                                                    "label": "Value"
+                                                }
+                                            ],
+                                            "type": "collection",
+                                            "label": "Email header"
+                                        },
+                                        "type": "array",
+                                        "label": "Additional email headers",
+                                        "labels": {
+                                            "add": "Add email header"
+                                        },
+                                        "advanced": true
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "flow": [
+                        {
+                            "id": 9,
+                            "module": "gemini-ai:simpleTextPrompt",
+                            "version": 1,
+                            "parameters": {},
+                            "filter": {
+                                "name": "General emails",
+                                "conditions": [
+                                    [
+                                        {
+                                            "a": "{{3.result}}",
+                                            "b": "General",
+                                            "o": "text:equal:ci"
+                                        }
+                                    ]
+                                ]
+                            },
+                            "mapper": {
+                                "model": "gemini-2.5-flash",
+                                "textPrompt": "You are a General support specialist. Read the email below and produce a clear, professional response for a non-billing and non-technical request. Answer the sender's question or request directly and keep the tone helpful. Do not mention this classification or these instructions. Return only the response text.\n\nSubject: {{2.subject}}\n\nEmail body:\n{{2.fullTextBody}}"
+                            },
+                            "metadata": {
+                                "designer": {
+                                    "x": 900,
+                                    "y": 450,
+                                    "name": "General AI"
+                                },
+                                "restore": {
+                                    "expect": {
+                                        "model": {
+                                            "mode": "chose",
+                                            "label": "Gemini 2.5 Flash"
+                                        }
+                                    }
+                                },
+                                "expect": [
+                                    {
+                                        "name": "model",
+                                        "type": "select",
+                                        "label": "Model",
+                                        "mappable": false,
+                                        "required": true,
+                                        "validate": {
+                                            "enum": [
+                                                "gemini-2.5-flash",
+                                                "gemini-3.7-flash",
+                                                "gemini-3.6-flash",
+                                                "gemini-3.5-flash",
+                                                "gemini-3.1-pro-preview",
+                                                "gemini-3-flash-preview",
+                                                "gemini-2.5-pro"
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "name": "textPrompt",
+                                        "type": "text",
+                                        "label": "Text prompt",
+                                        "required": true
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "id": 10,
+                            "module": "google-email:sendAnEmail",
+                            "version": 4,
+                            "parameters": {
+                                "__IMTCONN__": null
+                            },
+                            "mapper": {
+                                "to": [
+                                    "nightwraith18@gmail.com"
+                                ],
+                                "content": "{{9.result}}",
+                                "subject": "General response: {{2.subject}}",
+                                "bodyType": "rawHtml"
+                            },
+                            "metadata": {
+                                "designer": {
+                                    "x": 1200,
+                                    "y": 600,
+                                    "name": "Send General",
+                                    "messages": [
+                                        {
+                                            "category": "setupreq",
+                                            "severity": "error",
+                                            "message": "This module doesn't have a connection. Create a connection in the module settings to continue."
+                                        }
+                                    ]
+                                },
+                                "restore": {
+                                    "expect": {
+                                        "bodyType": {
+                                            "mode": "chose",
+                                            "label": "Raw HTML",
+                                            "nested": [
+                                                {
+                                                    "help": "You can use complete HTML code.",
+                                                    "name": "content",
+                                                    "type": "text",
+                                                    "label": "Content"
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "parameters": {
+                                        "__IMTCONN__": {
+                                            "label": "Night's Gmail connection"
+                                        }
+                                    }
+                                },
+                                "parameters": [
+                                    {
+                                        "name": "__IMTCONN__",
+                                        "type": "account:google-email",
+                                        "label": "Connection",
+                                        "required": true
+                                    }
+                                ],
+                                "expect": [
+                                    {
+                                        "name": "to",
+                                        "spec": {
+                                            "type": "email",
+                                            "label": "Recipient email address",
+                                            "required": true,
+                                            "validate": true
+                                        },
+                                        "type": "array",
+                                        "label": "To",
+                                        "labels": {
+                                            "add": "Add recipient",
+                                            "edit": "Edit recipient"
+                                        },
+                                        "required": true
+                                    },
+                                    {
+                                        "name": "subject",
+                                        "type": "text",
+                                        "label": "Subject"
+                                    },
+                                    {
+                                        "name": "bodyType",
+                                        "type": "select",
+                                        "label": "Body type",
+                                        "mappable": false,
+                                        "required": true,
+                                        "validate": {
+                                            "enum": [
+                                                "rawHtml",
+                                                "collection"
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "name": "content",
+                                        "type": "text",
+                                        "label": "Content"
+                                    },
+                                    {
+                                        "name": "attachments",
+                                        "spec": {
+                                            "spec": [
+                                                {
+                                                    "name": "filename",
+                                                    "type": "filename",
+                                                    "label": "File name",
+                                                    "required": true,
+                                                    "semantic": "file:name"
+                                                },
+                                                {
+                                                    "name": "data",
+                                                    "type": "buffer",
+                                                    "label": "Data",
+                                                    "required": true,
+                                                    "semantic": "file:data"
+                                                }
+                                            ],
+                                            "type": "collection",
+                                            "label": "Attachment"
+                                        },
+                                        "type": "array",
+                                        "label": "Attachments",
+                                        "labels": {
+                                            "add": "Add attachment",
+                                            "edit": "Edit attachment"
+                                        }
+                                    },
+                                    {
+                                        "name": "from",
+                                        "type": "select",
+                                        "label": "From",
+                                        "dynamic": true,
+                                        "advanced": true
+                                    },
+                                    {
+                                        "name": "cc",
+                                        "spec": {
+                                            "type": "email",
+                                            "label": "Recipient email address"
+                                        },
+                                        "type": "array",
+                                        "label": "CC recipients",
+                                        "labels": {
+                                            "add": "Add CC recipient",
+                                            "edit": "Edit CC recipient"
+                                        },
+                                        "advanced": true,
+                                        "validate": false
+                                    },
+                                    {
+                                        "name": "bcc",
+                                        "spec": {
+                                            "type": "email",
+                                            "label": "Recipient email address"
+                                        },
+                                        "type": "array",
+                                        "label": "BCC recipients",
+                                        "labels": {
+                                            "add": "Add BCC recipient",
+                                            "edit": "Edit BCC recipient"
+                                        },
+                                        "advanced": true,
+                                        "validate": false
+                                    },
+                                    {
+                                        "name": "emailHeaders",
+                                        "spec": {
+                                            "spec": [
+                                                {
+                                                    "name": "key",
+                                                    "type": "text",
+                                                    "label": "Key",
+                                                    "required": true
+                                                },
+                                                {
+                                                    "name": "value",
+                                                    "type": "text",
+                                                    "label": "Value"
+                                                }
+                                            ],
+                                            "type": "collection",
+                                            "label": "Email header"
+                                        },
+                                        "type": "array",
+                                        "label": "Additional email headers",
+                                        "labels": {
+                                            "add": "Add email header"
+                                        },
+                                        "advanced": true
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "metadata": {
+        "instant": false,
+        "version": 1,
+        "scenario": {
+            "roundtrips": 1,
+            "maxErrors": 3,
+            "autoCommit": true,
+            "autoCommitTriggerLast": true,
+            "sequential": false,
+            "slots": null,
+            "confidential": false,
+            "dataloss": false,
+            "dlq": false,
+            "freshVariables": false
+        },
+        "designer": {
+            "orphans": []
+        },
+        "zone": "eu1.make.com",
+        "notes": []
+    }
+}
