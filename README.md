@@ -1,0 +1,2 @@
+# AI-Powered-Email-Classification-Smart-Routing-System
+An AI-powered email automation system built using Make.com, Gmail, and Google Gemini AI. It monitors incoming emails, classifies them into Billing, Technical Support, and General categories, and routes them through dedicated workflows. Gemini AI assists in processing each category, while Gmail automates responses, reducing manual effort and improve
